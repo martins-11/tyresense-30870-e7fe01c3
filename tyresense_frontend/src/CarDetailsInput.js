@@ -1,22 +1,84 @@
 import React, { useState, useEffect } from "react";
 import "./CarDetailsInput.css";
 
-// --- Demo car image data ---
+// --- Updated car image data ---
 const carImages = {
   Toyota: {
-    Corolla: "https://cdn.motor1.com/images/mgl/0AN2x/s1/toyota-corolla.webp",
-    Camry: "https://cdn.motor1.com/images/mgl/68Zrp/s1/2022-toyota-camry.webp",
-    RAV4: "https://cdn.motor1.com/images/mgl/G47vJ/s1/2023-toyota-rav4.webp",
+    Corolla: "https://cdn.motor1.com/images/mgl/NGg1Kn/s1/2025-toyota-gr-corolla.jpg",
+    Camry: "https://cdn.motor1.com/images/mgl/BXyWGA/s1/2026-toyota-camry-dark-cosmos-paint.jpg",
+    RAV4: "https://cdn.motor1.com/images/mgl/6Z4jPk/s1/2026-toyota-rav4-gr-sport-exterior-2.jpg",
+    Highlander: "https://cdn.motor1.com/images/mgl/1ZEQQq/s4/2025-toyota-highlander-nightshade.webp",
+    Supra: "https://cdn.motor1.com/images/mgl/BXynrm/s1/toyota-gr-supra.jpg",
   },
   Honda: {
-    Civic: "https://cdn.motor1.com/images/mgl/kEdYL/s1/2022-honda-civic.webp",
-    Accord: "https://cdn.motor1.com/images/mgl/4elwL/s1/2023-honda-accord.webp",
-    CRV: "https://cdn.motor1.com/images/mgl/NYm2A/s1/2023-honda-cr-v.webp",
+    Civic: "https://cdn.motor1.com/images/mgl/G3noxb/s1/honda-civic.jpg",
+    Accord: "https://cdn.motor1.com/images/mgl/XBYMke/s1/honda-accord.jpg",
+    CRV: "https://cdn.motor1.com/images/mgl/RqYxGx/s1/honda-cr-v.jpg",
+    Pilot: "https://cdn.motor1.com/images/mgl/MkOGyN/s1/2025-honda-pilot-black-edition.jpg",
+    HRV: "https://cdn.motor1.com/images/mgl/NGjpPM/s1/2024-honda-hr-v.jpg",
   },
   Ford: {
-    Focus: "https://cdn.motor1.com/images/mgl/QPzvK/s1/ford-focus.webp",
-    Mustang: "https://cdn.motor1.com/images/mgl/vbWvA/s1/ford-mustang.webp",
-    Explorer: "https://cdn.motor1.com/images/mgl/91lKM/s1/ford-explorer.webp",
+    Escape: "https://cdn.motor1.com/images/mgl/W89KA6/s1/2023-ford-escape-st-line-elite.jpg",
+    Mustang: "https://cdn.motor1.com/images/mgl/EKbZe/s1/ford-mustang-my-2022-stealth-edition.jpg",
+    Explorer: "https://cdn.motor1.com/images/mgl/y24leo/s1/2025-ford-explorer-platinum.jpg",
+    F150: "https://cdn.motor1.com/images/mgl/y2p2lo/s1/2024-ford-f-150-raptor.jpg",
+    Bronco: "https://cdn.motor1.com/images/mgl/8AYVm2/s1/2025-ford-bronco.jpg",
+  },
+  BMW: {
+    "3 Series": "https://www.topgear.com/sites/default/files/2022/09/1-BMW-3-Series.jpg",
+    "5 Series": "https://mediapool.bmwgroup.com/cache/P9/201609/P90237243/P90237243-the-new-bmw-5-series-sedan-m-sport-10-2016-2249px.jpg",
+    X5: "https://hips.hearstapps.com/hmg-prod/images/p90495464-1677001974.jpg?crop=0.720xw:0.608xh;0.250xw,0.329xh&resize=2048:*",
+    M3: "https://cdn.motor1.com/images/mgl/y23QVm/s1/2025-bmw-m3-review.jpg",
+    iX: "https://cdn.motor1.com/images/mgl/Kb8kAb/s1/bmw-ix-xdrive60-2025.jpg",
+  },
+  Mercedes: {
+    "C-Class": "https://cdn.motor1.com/images/mgl/pXGyo/s1/mercedes-c-class-facelift-spy-photo.jpg",
+    "E-Class": "https://cdn.motor1.com/images/mgl/38M9W/s1/2024-mercedes-benz-e-class.webp",
+    GLC: "https://cdn.motor1.com/images/mgl/8mE4N/s1/2024-mercedes-benz-glc.webp",
+    S550: "https://cdn.motor1.com/images/mgl/O8v2m/s1/2024-mercedes-benz-s-class.webp",
+    EQS: "https://cdn.motor1.com/images/mgl/WByoY/s1/2023-mercedes-benz-eqs-sedan.webp",
+  },
+  Audi: {
+    A4: "https://cdn.motor1.com/images/mgl/VOk9R/s1/2015-5940892016-audi-a41.jpg",
+    A6: "https://cdn.motor1.com/images/mgl/1Z123w/s1/audi-a6-limousine-2025.jpg",
+    Q5: "https://cdn.motor1.com/images/mgl/0AOqZ/s1/2024-audi-q5.webp",
+    Q7: "https://cdn.motor1.com/images/mgl/gR3Wl/s1/2024-audi-q7.webp",
+    eTron: "https://cdn.motor1.com/images/mgl/bxmYV/s1/2024-audi-q8-e-tron.webp",
+  },
+  Tesla: {
+    "Model 3": "https://cdn.motor1.com/images/mgl/nPn4e/s1/2024-tesla-model-3.webp",
+    "Model S": "https://cdn.motor1.com/images/mgl/XByM4/s1/2023-tesla-model-s.webp",
+    "Model X": "https://cdn.motor1.com/images/mgl/m41V4/s1/2023-tesla-model-x.webp",
+    "Model Y": "https://cdn.motor1.com/images/mgl/eE4o3/s1/2023-tesla-model-y.webp",
+    Cybertruck: "https://cdn.motor1.com/images/mgl/O8vv3/s1/tesla-cybertruck.webp",
+  },
+  Hyundai: {
+    Elantra: "https://cdn.motor1.com/images/mgl/1zmGv/s1/2024-hyundai-elantra.webp",
+    Sonata: "https://cdn.motor1.com/images/mgl/gR3r0/s1/2024-hyundai-sonata.webp",
+    Tucson: "https://cdn.motor1.com/images/mgl/E4nQk/s1/2024-hyundai-tucson.webp",
+    Palisade: "https://cdn.motor1.com/images/mgl/WByQY/s1/2023-hyundai-palisade.webp",
+    Kona: "https://cdn.motor1.com/images/mgl/V4xKq/s1/2024-hyundai-kona.webp",
+  },
+  Kia: {
+    Forte: "https://cdn.motor1.com/images/mgl/R8rmj/s1/2024-kia-forte.webp",
+    K5: "https://cdn.motor1.com/images/mgl/wR3mJ/s1/2024-kia-k5.webp",
+    Sportage: "https://cdn.motor1.com/images/mgl/0ANR6/s1/2023-kia-sportage.webp",
+    Telluride: "https://cdn.motor1.com/images/mgl/gR31V/s1/2023-kia-telluride.webp",
+    EV6: "https://cdn.motor1.com/images/mgl/7Wv9R/s1/2023-kia-ev6.webp",
+  },
+  Nissan: {
+    Sentra: "https://cdn.motor1.com/images/mgl/MjoWn/s1/2024-nissan-sentra.webp",
+    Altima: "https://cdn.motor1.com/images/mgl/1zWJj/s1/2024-nissan-altima.webp",
+    Rogue: "https://cdn.motor1.com/images/mgl/WByjE/s1/2023-nissan-rogue.webp",
+    Pathfinder: "https://cdn.motor1.com/images/mgl/E4nkG/s1/2023-nissan-pathfinder.webp",
+    GT_R: "https://cdn.motor1.com/images/mgl/qj4bM/s1/2024-nissan-gt-r.webp",
+  },
+  Volkswagen: {
+    Jetta: "https://cdn.motor1.com/images/mgl/68Z4o/s1/2024-volkswagen-jetta.webp",
+    Passat: "https://cdn.motor1.com/images/mgl/oE9mG/s1/2022-volkswagen-passat.webp",
+    Tiguan: "https://cdn.motor1.com/images/mgl/4elE6/s1/2023-volkswagen-tiguan.webp",
+    Atlas: "https://cdn.motor1.com/images/mgl/O8vO1/s1/2024-volkswagen-atlas.webp",
+    ID4: "https://cdn.motor1.com/images/mgl/YxW40/s1/2024-volkswagen-id-4.webp",
   },
 };
 
@@ -80,6 +142,7 @@ export default function CarDetailsInput({
   const currentYear = new Date().getFullYear();
 
   useEffect(() => {
+    // Reset model and image when manufacturer changes
     setModel("");
     setCarImg(null);
     setErrors((e) => ({ ...e, manufacturer: null, model: null }));
@@ -112,7 +175,7 @@ export default function CarDetailsInput({
       const d = new Date(lastTyreChange);
       const maxDate = new Date();
       const minDate = new Date();
-      minDate.setFullYear(minDate.getFullYear() - 20);
+      minDate.setFullYear(minDate.getFullYear() - 20); // 20 years back from today
       if (d > maxDate || d < minDate)
         errs.lastTyreChange = `Date must be between ${minDate
           .toISOString()
@@ -330,7 +393,7 @@ export default function CarDetailsInput({
                 pointerEvents: "none"
               }}
               draggable={false}
-              onError={() => setCarImg(null)}
+              onError={() => setCarImg(null)} // Fallback to SVG if image fails to load
             />
           ) : (
             fallbackCarSVG
