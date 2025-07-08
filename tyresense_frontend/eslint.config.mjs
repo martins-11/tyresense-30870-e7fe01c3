@@ -15,6 +15,9 @@ export default [
         window: true,
         test: true,
         expect: true,
+        navigator: true,
+        setTimeout: true,
+        clearTimeout: true,
         process:true
       }
     },
