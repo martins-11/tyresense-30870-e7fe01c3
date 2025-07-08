@@ -31,7 +31,7 @@ const DEFAULT_BRANDS = [
     id: "continental",
     name: "Continental",
     tagline: "The Future in Motion",
-    image: getPublicUrl() + "/assets/continental-brand-cover.jpg",
+    image: getPublicUrl() + "/assets/continental-brand-cover1.jpg",
   },
   {
     id: "bridgestone",
