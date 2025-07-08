@@ -19,7 +19,7 @@ const DEFAULT_BRANDS = [
     id: "pirelli",
     name: "Pirelli",
     tagline: "Performance meets Innovation",
-    image: getPublicUrl() + "/assets/20250605_071317_Pirelli-Cintaurato-P7.jpg",
+    image: getPublicUrl() + "/assets/pirelli-brand-cover.jpg",
   },
   {
     id: "michelin",
@@ -31,13 +31,13 @@ const DEFAULT_BRANDS = [
     id: "continental",
     name: "Continental",
     tagline: "The Future in Motion",
-    image: getPublicUrl() + "/assets/20250605_071316_continental_pp_conti_cityplus.jpg",
+    image: getPublicUrl() + "/assets/continental-brand-cover.jpg",
   },
   {
     id: "bridgestone",
     name: "Bridgestone",
     tagline: "Solutions for your journey",
-    image: getPublicUrl() + "/assets/20250605_071315_Bridgestone-Turanza-T005-1.jpg",
+    image: getPublicUrl() + "/assets/bridgestone-brand-cover.jpg",
   },
 ];
 
