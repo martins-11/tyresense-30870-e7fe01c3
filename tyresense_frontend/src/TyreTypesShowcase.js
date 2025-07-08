@@ -26,7 +26,7 @@ const DEFAULT_BRANDS = [
     id: "michelin",
     name: "Michelin",
     tagline: "Motion for Life",
-    image: getPublicUrl() + "/assets/michelin-brand-cover.jpg",
+    image: getPublicUrl() + "/assets/michelin_brand_cover.jpg",
   },
   {
     id: "continental",
