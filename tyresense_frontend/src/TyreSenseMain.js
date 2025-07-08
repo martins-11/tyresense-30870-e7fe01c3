@@ -1,7 +1,6 @@
 // src/TyreSenseMain.js -- This file should ONLY contain this code.
 import React, { useEffect, useRef, useState } from "react";
-// Removed useLocation as it's no longer used
-import { Routes, Route, useNavigate, useParams } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, useParams } from "react-router-dom";
 import "./TyreSenseMain.css";
 import ReminderPopup from "./ReminderPopup";
 import CarDetailsInput from "./CarDetailsInput";
@@ -13,7 +12,30 @@ import TyreRecommendations from "./TyreRecommendations";
 import TyreLogoSVG from "./TyreLogoSVG";
 
 // Correct import path for TawkToChatWidget (assuming it's in src)
-import TawkToChatWidget from './TawkToChatWidget';
+import TawkToChatWidget from './TawkToChatWidget'; // <-- Corrected path
+
+// IMPORTANT: The `App` component definition below is likely a leftover
+// from a previous example. Your main app component is `MainTyreSenseRoutes`
+// which is then exported as `TyreSenseMain`.
+// You should *remove* this `function App() { ... }` block entirely
+// if `MainTyreSenseRoutes` is indeed your main component.
+// If you intend `App` to be your main root, then the `MainTyreSenseRoutes`
+// component below needs to be integrated into it, or `App` needs to be removed.
+// Given your `export default TyreSenseMain;` at the end, I suspect this
+// `function App()` block should be removed.
+
+/* REMOVE THIS BLOCK IF MainTyreSenseRoutes is your true app root:
+function App() {
+  return (
+    <div className="App">
+      {/* Your existing app content goes here *}
+      {/* Example: <Header /> <Routes /> <Footer /> *}
+      <TawkToChatWidget />
+    </div>
+  );
+}
+*/
+
 
 /**
  * MAIN_TYRES - main grid source for Porsche-style cards.
@@ -41,8 +63,7 @@ const MAIN_TYRES = [
     size: "225/40R18",
     price: 127,
     url: "https://www.michelin.co.uk/auto/tyres/michelin-pilot-sport-4",
-    // Corrected image path: underscore instead of hyphen as per file system
-    img: `${process.env.PUBLIC_URL || ""}/assets/michelin_brand_cover.jpg`,
+    img: `${process.env.PUBLIC_URL || ""}/assets/20250605_071317_michelin-tyres.jpg`,
     desc: "Motion for Life.",
     brandId: "michelin",
     img_alt: "Michelin Pilot Sport 4 tyre photo"
@@ -81,6 +102,8 @@ const MAIN_TYRES = [
  * prominent 'All tyres' option, and understated Porsche-inspired typography/colors.
  */
 
+
+
 // LocalStorage helpers (unchanged, minimal)
 function saveCarToLS(car) {
   window.localStorage.setItem("tyrewiseCar", JSON.stringify(car));
@@ -95,7 +118,7 @@ function loadCarFromLS() {
  * Handles navigation using react-router-dom for client-side routing.
  */
 
-function MainTyreSenseRoutes() { // Removed 'props' as it's unused
+function MainTyreSenseRoutes(props) {
   // Extract main app logic and state here (copied from above).
   const [stage, setStage] = useState("BLACKOUT");
   const [userCar, setUserCar] = useState(loadCarFromLS());
@@ -169,7 +192,7 @@ function MainTyreSenseRoutes() { // Removed 'props' as it's unused
 
   // For navigation
   const navigate = useNavigate();
-  // const location = useLocation(); // Removed 'location' as it's unused
+  const location = useLocation();
 
   // Brand selection navigation
   const handleBrandSelect = (brand) => {
@@ -180,7 +203,7 @@ function MainTyreSenseRoutes() { // Removed 'props' as it's unused
   };
 
   // If we are on the main page ("/")
-  // const isMainPage = location.pathname === "/" || location.pathname === ""; // Removed as it's unused
+  const isMainPage = location.pathname === "/" || location.pathname === "";
 
   // Navbar/logo is shown for both main and brand pages
   // Main UI per Porsche visual guidelines
@@ -381,13 +404,16 @@ function MainTyreSenseRoutes() { // Removed 'props' as it's unused
                         <div className="porsche-tyre-card-img-wrapper">
                           <img
                             src={tyre.img || tyre.image || ""}
-                            alt={`${tyre.brand} ${tyre.model} premium tyre${tyre.type ? ", " + tyre.type : ""}`}
+                            alt={
+                              tyre.img_alt ||
+                              `${tyre.brand} <span class="math-inline">\{tyre\.model\} premium tyre</span>{tyre.type ? ", " + tyre.type : ""}`
+                            }
                             className="porsche-tyre-card-image"
                             loading="lazy"
                             draggable={false}
                             style={{
-                              width: "100%", // Changed from 98% to 100%
-                              height: "100%", // Changed from 98% to 100%
+                              width: "98%",
+                              height: "98%",
                               maxWidth: 246,
                               maxHeight: 186,
                               objectFit: "cover",
@@ -445,13 +471,8 @@ function MainTyreSenseRoutes() { // Removed 'props' as it's unused
                   </section>
                   {/* --- END Porsche-style Porsche-dual-grid block --- */}
 
-                  {/* Add TyreTypesShowcase here, or combine with the above grid as needed */}
-                  {/* For example, if you want it after the main grid */}
-                  <div style={{ margin: "58px 0 0 0" }} /> {/* Spacing */}
-                  <TyreTypesShowcase onBrandSelect={handleBrandSelect} /> {/* Using TyreTypesShowcase */}
-                  <div style={{ margin: "58px 0 0 0" }} /> {/* Spacing for visual balance */}
-
-
+                  {/* Spacing for visual balance */}
+                  <div style={{ margin: "58px 0 0 0" }} />
                   <section style={{ maxWidth: 930, margin: "0 auto", padding: "24px 0" }}>
                     <CarDetailsInput
                       onSubmit={car => { setUserCar(car); saveCarToLS(car); }}
