@@ -219,6 +219,61 @@ function getWeatherLabel(code = "") {
   return "all";
 }
 
+// Helper function to infer tyre type based on car
+const getRecommendedTyreTypeForCar = (car) => {
+  if (!car || !car.make) return null; // No specific recommendation if car details are missing
+
+  const make = car.make.toLowerCase();
+  const model = car.model ? car.model.toLowerCase() : '';
+  const year = parseInt(car.year, 10); // Parse year to integer
+
+  // --- Performance/Sporty Cars ---
+  if (
+    make.includes('porsche') ||
+    make.includes('ferrari') ||
+    make.includes('lamborghini') ||
+    make.includes('mclaren') ||
+    (make.includes('bmw') && (model.includes('m') || model.includes('z4'))) ||
+    (make.includes('mercedes-benz') && model.includes('amg')) ||
+    (make.includes('audi') && model.includes('rs')) ||
+    (make.includes('ford') && model.includes('mustang')) ||
+    (make.includes('chevrolet') && model.includes('corvette'))
+  ) {
+    return 'Performance';
+  }
+
+  // --- Luxury/Premium Sedans/SUVs (often balanced between performance and comfort) ---
+  if (
+    (make.includes('bmw') || make.includes('mercedes-benz') || make.includes('audi') || make.includes('lexus')) &&
+    !['m', 'amg', 'rs', 'z4'].some(perf => model.includes(perf)) // Exclude obvious performance models
+  ) {
+    return 'Performance'; // Prioritize Performance for premium, but All-Season could also fit.
+  }
+
+  // --- General Consumer Cars (Sedans, Hatchbacks, Compact SUVs) ---
+  if (
+    make.includes('honda') ||
+    make.includes('toyota') ||
+    make.includes('hyundai') ||
+    make.includes('kia') ||
+    make.includes('nissan') ||
+    make.includes('volkswagen') ||
+    make.includes('maruti') || // Assuming Maruti for Indian context
+    make.includes('tata') ||   // Assuming Tata for Indian context
+    make.includes('mahindra')  // Assuming Mahindra for Indian context
+  ) {
+    return 'All-Season'; // Most common for daily drivers in varied climates
+  }
+
+  // Fallback for older cars or cars without specific performance connotations
+  if (year && year < 2000) { // Example: assume older cars lean towards all-season
+      return 'All-Season';
+  }
+
+  return null; // Default: no specific recommendation based on car
+};
+
+
 function TyreRecommendations({ car, userLocation, onSetReminder }) {
   const [filters, setFilters] = useState({ brand: "", size: "", budget: "" });
   const [weather, setWeather] = useState(null);
@@ -259,9 +314,12 @@ function TyreRecommendations({ car, userLocation, onSetReminder }) {
     return "all";
   }, [weather]);
 
-  // Filter tyres by filters and weather
+  // Filter tyres by filters, weather, AND CAR DETAILS
   const filteredTyres = useMemo(() => {
+    const recommendedTyreType = getRecommendedTyreTypeForCar(car);
+
     return ALL_TYRES.filter((tyre) => {
+      // Existing filters (brand, size, budget)
       if (filters.brand && tyre.brand !== filters.brand) return false;
       if (filters.size && tyre.size !== "Various" && tyre.size !== filters.size) return false; // Handle "Various" size
       if (
@@ -273,15 +331,37 @@ function TyreRecommendations({ car, userLocation, onSetReminder }) {
         )
       )
         return false;
-      // Ensure that if a weather type is active, "all" season tyres are still shown,
-      // and specific weather tyres match the current weather.
+
+      // Weather filter
+      // If a weather type is active, show "all" season tyres,
+      // and specific weather tyres that match the current weather.
       if (weatherType !== "all" && tyre.weather !== "all" && tyre.weather !== weatherType)
         return false;
-      return true;
-    });
-  }, [filters, weatherType]);
 
-  // Options for filters
+      // NEW: Filter based on car's recommended tyre type
+      if (recommendedTyreType) {
+          // If the car's recommended type is "Performance",
+          // allow both "Performance" and "Summer" tyres to be shown.
+          // This makes the recommendations more flexible for high-performance cars.
+          if (recommendedTyreType === 'Performance' && (tyre.type === 'Performance' || tyre.type === 'Summer')) {
+              // This is a match, continue to next filter
+          }
+          // If the car's recommended type is "All-Season",
+          // allow "All-Season" and "Touring" tyres.
+          else if (recommendedTyreType === 'All-Season' && (tyre.type === 'All-Season' || tyre.type === 'Touring')) {
+              // This is a match, continue to next filter
+          }
+          // For other specific recommendations (e.g., "Winter"), demand an exact match.
+          else if (tyre.type !== recommendedTyreType) {
+              return false; // Does not match the car's recommended type
+          }
+      }
+
+      return true; // Tyre passes all filters
+    });
+  }, [filters, weatherType, car]); // Add 'car' to dependencies of useMemo
+
+  // Options for filters (remain the same)
   const brandOptions = uniqueFrom(ALL_TYRES, "brand");
   const sizeOptions = uniqueFrom(ALL_TYRES, "size");
   const budgetOptions = [
@@ -290,7 +370,7 @@ function TyreRecommendations({ car, userLocation, onSetReminder }) {
     { val: "premium", label: "Premium (>£125)" },
   ];
 
-  // Shared styles to avoid repetition
+  // Shared styles for buttons (remain the same)
   const btnPrimaryStyle = {
     marginTop: 7,
     fontSize: "0.97rem",
@@ -305,48 +385,24 @@ function TyreRecommendations({ car, userLocation, onSetReminder }) {
     transition: "background 0.14s, color 0.13s, border 0.13s",
   };
 
-  // Slider settings for react-slick
+  // Slider settings for react-slick (remain the same)
   const sliderSettings = {
-    dots: true, // Show navigation dots
-    infinite: false, // Set to true if you want looping carousel
+    dots: true,
+    infinite: false,
     speed: 500,
-    slidesToShow: 4, // Show 4 tyres at a time on large screens
+    slidesToShow: 4,
     slidesToScroll: 1,
     initialSlide: 0,
     responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          infinite: false,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          infinite: false,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          infinite: false,
-          dots: true,
-        },
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 3, slidesToScroll: 1, infinite: false, dots: true } },
+      { breakpoint: 768, settings: { slidesToShow: 2, slidesToScroll: 1, infinite: false, dots: true } },
+      { breakpoint: 480, settings: { slidesToShow: 1, slidesToScroll: 1, infinite: false, dots: true } },
     ],
   };
 
   return (
     <>
-      {/* Tyre replacement reminder div */}
+      {/* Tyre replacement reminder div (remains the same) */}
       <div
         className="ts-reminder-top"
         style={{
@@ -359,7 +415,7 @@ function TyreRecommendations({ car, userLocation, onSetReminder }) {
           borderRadius: "8px",
           marginBottom: "20px",
           boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-          display: onSetReminder ? "block" : "none", // Only show if onSetReminder is provided
+          display: onSetReminder ? "block" : "none",
         }}
       >
         <p style={{ margin: 0 }}>
@@ -443,8 +499,6 @@ function TyreRecommendations({ car, userLocation, onSetReminder }) {
             <Slider {...sliderSettings}>
               {filteredTyres.map((tyre, idx) => (
                 <div key={tyre.id} style={{ padding: "0 8px" }}>
-                  {" "}
-                  {/* Adjusted padding for spacing */}
                   <motion.article
                     className="ts-tyre-card"
                     role="listitem"
@@ -463,7 +517,7 @@ function TyreRecommendations({ car, userLocation, onSetReminder }) {
                       justifyContent: "center",
                       position: "relative",
                       outline: "none",
-                      height: "auto", // Ensure height adjusts for content
+                      height: "auto",
                     }}
                     whileHover={{ scale: 1.05, rotate: 0 }}
                     initial={{ y: 22, opacity: 0 }}
@@ -499,8 +553,8 @@ function TyreRecommendations({ car, userLocation, onSetReminder }) {
                     <div style={{ color: "#edeef0", fontWeight: 600, fontSize: "0.98rem" }}>
                       {tyre.model}
                     </div>
-                    <div style={{ color: "#7d7d85", fontSize: "0.91rem" }}>{tyre.size}</div>
-                    <div style={{ color: "#edeef0", marginBottom: 3 }}>{tyre.type}</div>
+                    <div style={{ color: "#7d7d85", fontSize: "0.91rem" }}>{tyre.type}</div>
+                    <div style={{ color: "#edeef0", marginBottom: 3 }}>{tyre.size}</div> {/* Displaying size below type */}
                     <button
                       type="button"
                       style={btnPrimaryStyle}
