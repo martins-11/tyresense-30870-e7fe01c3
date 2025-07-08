@@ -25,6 +25,15 @@
   /* Remove all neon tokens */
 }
 
+.brands-title {
+    color: #b4081b;
+    font-size: 50px;
+    /* Add margin-top if needed to create space above it */
+    margin-top: 20px; /* Adjust as needed */
+    margin-bottom: 0px;
+    margin-left: 45px; /* Adjust as needed */
+}
+
 .tyresense-main {
   min-height: 100vh;
   background: var(--porsche-black);
@@ -132,24 +141,27 @@
 
 .porsche-tyre-card-img-wrapper {
   width: 100%;
-  padding-top: 60%;
-  position: relative;
+  padding-top: 60%; /* This maintains your desired aspect ratio / height */
+  position: relative; /* Keep this */
   background: var(--porsche-deep-black);
   border-bottom: 1.5px solid var(--porsche-border-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  /* Remove flex properties; the image will be absolutely positioned within */
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  overflow: hidden; /* Important for containing the image within the rounded corners */
 }
+
 .porsche-tyre-card-image {
-  width: 98%;
-  height: 98%;
-  max-width: 246px;
-  max-height: 110%;
-  object-fit: cover;
-  border-radius: var(--porsche-card-radius-sm);
-  margin: 0 auto;
-  display: block;
+  position: absolute; /* Makes the image position relative to its parent wrapper */
+  top: 0;
+  left: 0;
+  width: 100%; /* Makes the image take 100% width of the wrapper */
+  height: 100%; /* Makes the image take 100% height of the wrapper */
+  object-fit: cover; /* Ensures the image covers the area, cropping if necessary */
+  /* Remove width: 98%, height: 98%, max-width, max-height, margin: 0 auto; */
+  /* Keep other visual styles */
+  border-radius: var(--porsche-card-radius-sm); /* Keep this if you want the image itself to have the radius */
   filter: brightness(0.98) contrast(1.09);
   box-shadow: 0 6px 21.5px 0 #22222433;
   background: #18181b;
@@ -246,16 +258,18 @@
   color: var(--porsche-black);
 }
 
-/* Gradient red, bold, for main container wording/titles */
+/* Removed the .tyresense-brand-gradient-text rule entirely */
+/*
 .tyresense-brand-gradient-text {
   background: linear-gradient(87deg, #D41414 14%, #b4081b 82%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: transparent; /* fallback */
+  color: transparent; // fallback
   font-weight: 900;
   text-shadow: none !important;
 }
+*/
 .porsche-tyre-card-all-desc {
   font-size: 1.11rem;
   color: var(--porsche-grey-dark);

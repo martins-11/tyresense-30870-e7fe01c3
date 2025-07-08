@@ -1,41 +1,14 @@
-// src/TyreSenseMain.js -- This file should ONLY contain this code.
 import React, { useEffect, useRef, useState } from "react";
-import { Routes, Route, useNavigate, useLocation, useParams } from "react-router-dom";
-import "./TyreSenseMain.css";
+import { Routes, Route, useNavigate, useParams } from "react-router-dom";
+import "./TyreSenseMain.css"; // Ensure your CSS file is correctly linked
 import ReminderPopup from "./ReminderPopup";
 import CarDetailsInput from "./CarDetailsInput";
 import GoogleMapsStoreLocator from "./GoogleMapsStoreLocator";
-import TyreTypesShowcase from "./TyreTypesShowcase";
 import TyreBrandDetail from "./TyreBrandDetail";
 import AnimatedCarIntro from "./AnimatedCarIntro";
 import TyreRecommendations from "./TyreRecommendations";
 import TyreLogoSVG from "./TyreLogoSVG";
-
-// Correct import path for TawkToChatWidget (assuming it's in src)
-import TawkToChatWidget from './TawkToChatWidget'; // <-- Corrected path
-
-// IMPORTANT: The `App` component definition below is likely a leftover
-// from a previous example. Your main app component is `MainTyreSenseRoutes`
-// which is then exported as `TyreSenseMain`.
-// You should *remove* this `function App() { ... }` block entirely
-// if `MainTyreSenseRoutes` is indeed your main component.
-// If you intend `App` to be your main root, then the `MainTyreSenseRoutes`
-// component below needs to be integrated into it, or `App` needs to be removed.
-// Given your `export default TyreSenseMain;` at the end, I suspect this
-// `function App()` block should be removed.
-
-/* REMOVE THIS BLOCK IF MainTyreSenseRoutes is your true app root:
-function App() {
-  return (
-    <div className="App">
-      {/* Your existing app content goes here *}
-      {/* Example: <Header /> <Routes /> <Footer /> *}
-      <TawkToChatWidget />
-    </div>
-  );
-}
-*/
-
+import TawkToChatWidget from './TawkToChatWidget';
 
 /**
  * MAIN_TYRES - main grid source for Porsche-style cards.
@@ -50,10 +23,10 @@ const MAIN_TYRES = [
     size: "225/45R17",
     price: 118,
     url: "https://www.pirelli.com/tyres/en-ww/cinturato/p7",
-    img: `${process.env.PUBLIC_URL || ""}/assets/20250605_071317_Pirelli-Cintaurato-P7.jpg`,
+    img: `${process.env.PUBLIC_URL || ""}/assets/pirelli-brand-cover.jpg`,
     desc: "Performance meets Innovation.",
     brandId: "pirelli",
-    img_alt: "Pirelli Cinturato P7 tyre photo"
+    img_alt: "Pirelli Cinturato P7 tyre photo, full detail"
   },
   {
     id: "michelin_ps4",
@@ -63,10 +36,10 @@ const MAIN_TYRES = [
     size: "225/40R18",
     price: 127,
     url: "https://www.michelin.co.uk/auto/tyres/michelin-pilot-sport-4",
-    img: `${process.env.PUBLIC_URL || ""}/assets/20250605_071317_michelin-tyres.jpg`,
+    img: `${process.env.PUBLIC_URL || ""}/assets/michelin_brand_cover.jpg`,
     desc: "Motion for Life.",
     brandId: "michelin",
-    img_alt: "Michelin Pilot Sport 4 tyre photo"
+    img_alt: "Michelin Pilot Sport 4 tyre photo, full detail"
   },
   {
     id: "continental_sport",
@@ -76,10 +49,10 @@ const MAIN_TYRES = [
     size: "225/40R18",
     price: 127,
     url: "https://www.continental-tires.com/uk/en/b2c/car/tires/contisportcontact-6.html",
-    img: `${process.env.PUBLIC_URL || ""}/assets/20250605_071316_continental_pp_conti_cityplus.jpg`,
+    img: `${process.env.PUBLIC_URL || ""}/assets/continental-brand-cover1.jpg`,
     desc: "The Future in Motion.",
     brandId: "continental",
-    img_alt: "Continental SportContact 6 tyre photo"
+    img_alt: "Continental SportContact 6 tyre photo, full detail"
   },
   {
     id: "bridgestone_turanza",
@@ -89,20 +62,12 @@ const MAIN_TYRES = [
     size: "195/65R15",
     price: 103,
     url: "https://www.bridgestone.co.uk/our-products/car-tyres/turanza-t005",
-    img: `${process.env.PUBLIC_URL || ""}/assets/20250605_071315_Bridgestone-Turanza-T005-1.jpg`,
+    img: `${process.env.PUBLIC_URL || ""}/assets/bridgestone-brand-cover.jpg`,
     desc: "Solutions for your journey.",
     brandId: "bridgestone",
-    img_alt: "Bridgestone Turanza T005 tyre photo"
+    img_alt: "Bridgestone Turanza T005 tyre photo, full detail"
   }
 ];
-
-/**
- * Remove all neon styling, use only Porsche.com palette and minimalist structure.
- * Use a dual card/grid main layout with a looping video background hero,
- * prominent 'All tyres' option, and understated Porsche-inspired typography/colors.
- */
-
-
 
 // LocalStorage helpers (unchanged, minimal)
 function saveCarToLS(car) {
@@ -118,9 +83,11 @@ function loadCarFromLS() {
  * Handles navigation using react-router-dom for client-side routing.
  */
 
-function MainTyreSenseRoutes(props) {
-  // Extract main app logic and state here (copied from above).
+function MainTyreSenseRoutes() {
+  // Initialize the stage to "BLACKOUT" to trigger intro animation
   const [stage, setStage] = useState("BLACKOUT");
+  const logoFadeInTimeout = useRef();
+
   const [userCar, setUserCar] = useState(loadCarFromLS());
   const [reminderTyre, setReminderTyre] = useState(null);
   const [showReminderPopup, setShowReminderPopup] = useState(false);
@@ -139,7 +106,6 @@ function MainTyreSenseRoutes(props) {
 
   // -- Tyre replacement popup logic: Show reminder (modal/popup) on "Remind Me",
   // and/or when tyres are due for replacement --
-  // If 'lastTyreChange' is >6 years ago, show popup when app loads or car changes
 
   // Make reminder popup visible
   function handleSetReminderPopup(tyre) {
@@ -163,26 +129,33 @@ function MainTyreSenseRoutes(props) {
         setShowReminderPopup(true);
       }
     }
-  }, [userCar]); // Re-run if userCar data changes
+  }, [userCar]);
 
+  // Re-introduce animation-related useEffects and functions
+  useEffect(() => {
+    setStage("CAR_ANIM"); // Start the car animation on component mount
+  }, []);
 
-  const logoFadeInTimeout = useRef();
-  useEffect(() => { setStage("CAR_ANIM"); }, []);
   const handleAnimatedCarDone = () => {
-    setStage("LOGO_FADEIN");
+    setStage("LOGO_FADEIN"); // After car animation, fade in the logo
     logoFadeInTimeout.current = setTimeout(() => {
-      setStage("LIFT_BLACKOUT");
-      setTimeout(() => setStage("SHOW_MAIN"), 540);
+      setStage("LIFT_BLACKOUT"); // Lift the blackout
+      setTimeout(() => setStage("SHOW_MAIN"), 540); // Show main content after blackout lifts
     }, 660);
   };
-  useEffect(() => () => { if (logoFadeInTimeout.current) clearTimeout(logoFadeInTimeout.current); }, []);
+
+  // Cleanup for the timeout
+  useEffect(() => {
+    return () => {
+      if (logoFadeInTimeout.current) clearTimeout(logoFadeInTimeout.current);
+    };
+  }, []);
 
   function closeReminderPopup() {
     setShowReminderPopup(false);
     setTimeout(() => setReminderTyre(null), 300);
   }
 
-  // --- Blackout overlay states as before ---
   const showBlackout = stage !== "SHOW_MAIN";
   const blackoutStyle = showBlackout
     ? { opacity: stage === "LIFT_BLACKOUT" ? 0 : 1, transition: "opacity 540ms cubic-bezier(.71,0,.38,1)", pointerEvents: "all", zIndex: 2000 }
@@ -192,18 +165,15 @@ function MainTyreSenseRoutes(props) {
 
   // For navigation
   const navigate = useNavigate();
-  const location = useLocation();
 
   // Brand selection navigation
   const handleBrandSelect = (brand) => {
     // Go to /brand/<brand.id> page
     if (brand && brand.id) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
       navigate(`/brand/${brand.id}`);
     }
   };
-
-  // If we are on the main page ("/")
-  const isMainPage = location.pathname === "/" || location.pathname === "";
 
   // Navbar/logo is shown for both main and brand pages
   // Main UI per Porsche visual guidelines
@@ -276,7 +246,7 @@ function MainTyreSenseRoutes(props) {
           </div>
         </nav>
       )}
-      {/* Blackout overlay */}
+      {/* Blackout overlay (will now show during animation) */}
       {showBlackout && (
         <div
           className="blackout-overlay"
@@ -296,7 +266,7 @@ function MainTyreSenseRoutes(props) {
           }}
         ></div>
       )}
-      {/* Animated car intro staged in center */}
+      {/* Animated car intro staged in center (will now show during animation) */}
       {showAnimatedCar && (
         <AnimatedCarIntro visible onAnimationComplete={handleAnimatedCarDone} />
       )}
@@ -326,38 +296,34 @@ function MainTyreSenseRoutes(props) {
                   <div className="porsche-hero-frost" />
                 </div>
                 {/* Main overlayed content */}
-                <div className="porsche-main-content">
-                  <div style={{ maxWidth: 1320, margin: "0 auto", padding: "10px 8vw 28px 8vw" }}>
-                    <h1
-                      className="porsche-title tyresense-brand-gradient-text"
-                      style={{
-                        marginTop: 0,
-                        background: "linear-gradient(90deg, #D41414 18%, #b4081b 82%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                        fontWeight: 900,
-                        textTransform: "uppercase"
-                      }}
-                    >
-                      TyreSense
-                    </h1>
-                    <div
-                      className="porsche-subtitle tyresense-brand-gradient-text"
-                      style={{
-                        fontWeight: 600,
-                        fontSize: "1.14rem",
-                        background: "linear-gradient(90deg, #D41414 6%, #b4081b 84%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                        marginBottom: 12
-                      }}
-                    >
-                      Premium tyres. Engineered for performance. Select your vehicle and explore leading brands.
-                    </div>
+                <div className="porsche-main-content" style={{ maxWidth: 1320, margin: "0 auto", padding: "10px 8vw 28px 8vw" }}>
+                  <h1
+                    className="porsche-title"
+                    style={{
+                      marginTop: 0,
+                      color: "#fff",
+                      fontWeight: 900,
+                      textTransform: "uppercase"
+                    }}
+                  >
+                    TyreSense
+                  </h1>
+                  <div
+                    className="porsche-subtitle"
+                    style={{
+                      fontWeight: 600,
+                      fontSize: "1.50rem",
+                      color: "#b0b0b0",
+                      marginBottom:60,
+                      marginTop: 50,
+                      marginLeft: 40
+                    }}
+                  >
+                    Premium tyres. <br/> <br/>
+                    Engineered for performance. <br/> <br/> 
+                    Select your vehicle and explore leading brands.
                   </div>
-
+                    <h2 className="brands-title">Brands</h2>
                   {/* --- Porsche-style full-width main tyres grid: replaces ALL previous grid/card JSX --- */}
                   <section
                     className="porsche-dual-grid"
@@ -373,15 +339,12 @@ function MainTyreSenseRoutes(props) {
                         aria-pressed="false"
                         aria-haspopup="dialog"
                         style={{ cursor: "pointer", outline: "none" }}
+                        // Clicking the whole card navigates to brand page
                         onClick={() => {
-                          // Accessible scroll-to-top on card click and in-app navigation
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                          if (typeof handleBrandSelect === "function") {
-                            handleBrandSelect({
-                              id: tyre.brandId || (typeof tyre.brand === "string" ? tyre.brand.toLowerCase() : tyre.brand),
-                              name: tyre.brand,
-                            });
-                          }
+                          handleBrandSelect({
+                            id: tyre.brandId || (typeof tyre.brand === "string" ? tyre.brand.toLowerCase() : tyre.brand),
+                            name: tyre.brand,
+                          });
                         }}
                         onKeyDown={(e) => {
                           if (
@@ -391,31 +354,25 @@ function MainTyreSenseRoutes(props) {
                             e.keyCode === 32
                           ) {
                             e.preventDefault();
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                            if (typeof handleBrandSelect === "function") {
-                              handleBrandSelect({
-                                id: tyre.brandId || (typeof tyre.brand === "string" ? tyre.brand.toLowerCase() : tyre.brand),
-                                name: tyre.brand,
-                              });
-                            }
+                            handleBrandSelect({
+                              id: tyre.brandId || (typeof tyre.brand === "string" ? tyre.brand.toLowerCase() : tyre.brand),
+                              name: tyre.brand,
+                            });
                           }
                         }}
                       >
                         <div className="porsche-tyre-card-img-wrapper">
                           <img
                             src={tyre.img || tyre.image || ""}
-                            alt={
-                              tyre.img_alt ||
-                              `${tyre.brand} <span class="math-inline">\{tyre\.model\} premium tyre</span>{tyre.type ? ", " + tyre.type : ""}`
-                            }
+                            alt={`${tyre.brand} premium tyre`}
                             className="porsche-tyre-card-image"
                             loading="lazy"
                             draggable={false}
+                            // Inline styles will be overridden by CSS if you set them in TyreSenseMain.css
+                            // Keep these as fallbacks or for specific overrides
                             style={{
-                              width: "98%",
-                              height: "98%",
-                              maxWidth: 246,
-                              maxHeight: 186,
+                              width: "100%",
+                              height: "100%",
                               objectFit: "cover",
                               background: "#18181b",
                               margin: "0 auto",
@@ -426,44 +383,29 @@ function MainTyreSenseRoutes(props) {
                         </div>
                         <div className="porsche-tyre-card-content">
                           <span className="porsche-tyre-brand">{tyre.brand}</span>
-                          <span
-                            className="porsche-accent-red"
-                            style={{ fontWeight: 700, margin: "3px 0 4px 0" }}
-                          >
-                            {tyre.model}
-                          </span>
-                          <span
-                            className="porsche-tyre-details"
-                            style={{ margin: "0 0 2px 0", fontSize: "0.97rem" }}
-                          >
-                            {tyre.type ? <><b>{tyre.type}</b> · </> : null}
-                            {tyre.size}
-                            {tyre.price ? <> · £{tyre.price}</> : null}
-                          </span>
-                          {tyre.desc && (
-                            <span
-                              className="porsche-tyre-details"
-                              style={{ color: "#a9aaae", fontSize: "0.96rem" }}
-                            >
-                              {tyre.desc}
-                            </span>
-                          )}
+                          {/* Removed model, type, size, price, desc */}
                           <button
-                            className="porsche-tyre-card-btn"
-                            aria-label={`Buy ${tyre.brand} ${tyre.model} now`}
+                            className="porsche-tyre-card-btn" // This class will be styled for red accent
+                            aria-label={`View ${tyre.brand} brand details`} // Updated ARIA label
                             tabIndex={0}
                             onClick={e => {
-                              e.stopPropagation();
-                              if (tyre.url) window.open(tyre.url, "_blank", "noopener,noreferrer");
+                              e.stopPropagation(); // Prevent parent article's click
+                              handleBrandSelect({
+                                id: tyre.brandId || (typeof tyre.brand === "string" ? tyre.brand.toLowerCase() : tyre.brand),
+                                name: tyre.brand,
+                              });
                             }}
                             onKeyDown={e => {
                               if (e.key === "Enter" || e.key === " " || e.keyCode === 13 || e.keyCode === 32) {
                                 e.stopPropagation();
-                                if (tyre.url) window.open(tyre.url, "_blank", "noopener,noreferrer");
+                                handleBrandSelect({
+                                  id: tyre.brandId || (typeof tyre.brand === "string" ? tyre.brand.toLowerCase() : tyre.brand),
+                                  name: tyre.brand,
+                                });
                               }
                             }}
                           >
-                            Buy Now
+                            Explore
                           </button>
                         </div>
                       </article>
@@ -471,8 +413,6 @@ function MainTyreSenseRoutes(props) {
                   </section>
                   {/* --- END Porsche-style Porsche-dual-grid block --- */}
 
-                  {/* Spacing for visual balance */}
-                  <div style={{ margin: "58px 0 0 0" }} />
                   <section style={{ maxWidth: 930, margin: "0 auto", padding: "24px 0" }}>
                     <CarDetailsInput
                       onSubmit={car => { setUserCar(car); saveCarToLS(car); }}
@@ -521,7 +461,6 @@ function MainTyreSenseRoutes(props) {
             stage === "SHOW_MAIN" && (
               <BrandDetailRoute
                 onBackToList={() => {
-                  // Go "home" rather than browser goBack to force rerender
                   navigate("/");
                 }}
               />
@@ -542,7 +481,6 @@ function MainTyreSenseRoutes(props) {
  * This solves any React mount issues if <TyreBrandDetail /> was not updating on navigation
  */
 function BrandDetailRoute({ onBackToList }) {
-  // PUBLIC_INTERFACE
   const { brandId } = useParams();
   const brand = brandId ? { id: brandId } : undefined;
   return (
