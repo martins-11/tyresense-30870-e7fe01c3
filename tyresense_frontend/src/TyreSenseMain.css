@@ -338,3 +338,17 @@
 .neon-accent, .neon-gold, .neon-premium-btn, .ts-btn, .ts-tyre-card, .ts-card-placeholder {
   all: unset !important;
 }
+
+.app-footer {
+  width: 100%;
+  text-align: center;
+  padding: 20px 0;
+  /* Adjust background to match your desired "Vistara" style - often a very light, almost off-white background */
+  background: var(--porsche-black); /* A light grey/off-white background */
+  /* Adjust text color to match the "Vistara" style - often a darker, softer grey */
+  color: var(--porsche-grey-mid); /* A darker grey for the text */
+  font-size: 0.9rem;
+  margin-top: 50px; /* Add some space above the footer */
+  border-top: 1px solid #e0e0e0; /* A subtle, light border at the top */
+  font-family: 'Roboto', Helvetica, Arial, sans-serif; /* Use your main font family */
+}

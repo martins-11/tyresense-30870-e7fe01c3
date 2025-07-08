@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import "./TyreSenseMain.css"; // Ensure your CSS file is correctly linked
-import ReminderPopup from "./ReminderPopup";
+// import ReminderPopup from "./ReminderPopup"; // REMOVED
 import CarDetailsInput from "./CarDetailsInput";
 import GoogleMapsStoreLocator from "./GoogleMapsStoreLocator";
 import TyreBrandDetail from "./TyreBrandDetail";
@@ -89,8 +89,8 @@ function MainTyreSenseRoutes() {
   const logoFadeInTimeout = useRef();
 
   const [userCar, setUserCar] = useState(loadCarFromLS());
-  const [reminderTyre, setReminderTyre] = useState(null);
-  const [showReminderPopup, setShowReminderPopup] = useState(false);
+  // const [reminderTyre, setReminderTyre] = useState(null); // REMOVED
+  // const [showReminderPopup, setShowReminderPopup] = useState(false); // REMOVED
 
   // --- Geolocation for map ---
   const [userLocation, setUserLocation] = useState(null);
@@ -108,28 +108,28 @@ function MainTyreSenseRoutes() {
   // and/or when tyres are due for replacement --
 
   // Make reminder popup visible
-  function handleSetReminderPopup(tyre) {
-    setReminderTyre(tyre);
-    setShowReminderPopup(true);
-  }
+  // function handleSetReminderPopup(tyre) { // REMOVED
+  //   setReminderTyre(tyre);
+  //   setShowReminderPopup(true);
+  // }
 
   // Check for overdue tyres and auto-trigger popup on mount/car change
-  useEffect(() => {
-    if (userCar && userCar.lastTyreChange) {
-      const lastChangeDate = new Date(userCar.lastTyreChange);
-      const today = new Date();
-      const diffYears = (today - lastChangeDate) / (1000 * 60 * 60 * 24 * 365.25);
-      // Criteria: more than 6 years since tyre change triggers popup (overdue)
-      if (diffYears >= 6 && !showReminderPopup) {
-        // Note: Use any demo tyre as context; in real app, would track which
-        setReminderTyre({
-          brand: userCar.make ? "Your Vehicle Tyre" : "Tyre",
-          model: userCar.model ? userCar.model : "Model",
-        });
-        setShowReminderPopup(true);
-      }
-    }
-  }, [userCar]);
+  // useEffect(() => { // REMOVED
+  //   if (userCar && userCar.lastTyreChange) {
+  //     const lastChangeDate = new Date(userCar.lastTyreChange);
+  //     const today = new Date();
+  //     const diffYears = (today - lastChangeDate) / (1000 * 60 * 60 * 24 * 365.25);
+  //     // Criteria: more than 6 years since tyre change triggers popup (overdue)
+  //     if (diffYears >= 6 && !showReminderPopup) {
+  //       // Note: Use any demo tyre as context; in real app, would track which
+  //       setReminderTyre({
+  //         brand: userCar.make ? "Your Vehicle Tyre" : "Tyre",
+  //         model: userCar.model ? userCar.model : "Model",
+  //       });
+  //       setShowReminderPopup(true);
+  //     }
+  //   }
+  // }, [userCar]);
 
   // Re-introduce animation-related useEffects and functions
   useEffect(() => {
@@ -151,10 +151,10 @@ function MainTyreSenseRoutes() {
     };
   }, []);
 
-  function closeReminderPopup() {
-    setShowReminderPopup(false);
-    setTimeout(() => setReminderTyre(null), 300);
-  }
+  // function closeReminderPopup() { // REMOVED
+  //   setShowReminderPopup(false);
+  //   setTimeout(() => setReminderTyre(null), 300);
+  // }
 
   const showBlackout = stage !== "SHOW_MAIN";
   const blackoutStyle = showBlackout
@@ -233,7 +233,6 @@ function MainTyreSenseRoutes() {
                 textShadow: "0 0 13px #e1060078, 0 0.5px 8px #23232733",
                 filter: "brightness(1.13) blur(.01px)",
                 verticalAlign: "middle",
-                fontFamily: "'Roboto', Helvetica, Arial, sans-serif",
                 marginLeft: 1,
                 display: "inline-block",
                 background: "none",
@@ -420,12 +419,8 @@ function MainTyreSenseRoutes() {
                       persistCar={saveCarToLS}
                     />
                   </section>
-                  {/* Map section */}
-                  <section style={{ maxWidth: 900, margin: "0 auto", padding: "26px 13px 0 13px" }}>
-                    <GoogleMapsStoreLocator />
-                  </section>
-                  {/* Porsche-style popover for reminder */}
-                  <section style={{ maxWidth: 900, margin: "30px auto 0 auto", minHeight: 64 }}>
+                  {/* Removed the entire ReminderPopup section */}
+                  {/* <section style={{ maxWidth: 900, margin: "30px auto 0 auto", minHeight: 64 }}>
                     {showReminderPopup && reminderTyre ? (
                       <ReminderPopup
                         tyre={reminderTyre}
@@ -441,13 +436,22 @@ function MainTyreSenseRoutes() {
                         <span>Tyre replacement reminder will appear here.</span>
                       </div>
                     )}
+                  </section> */}
+
+                  {/* Tyre Recommendations section */}
+                  <section style={{ maxWidth: 900, margin: "30px auto 0 auto" }}>
                     <TyreRecommendations
                       car={userCar}
                       userLocation={userLocation}
-                      onSetReminder={handleSetReminderPopup}
+                      // onSetReminder={handleSetReminderPopup} // REMOVED
                       userTyreData={null}
                       persistTyreData={() => {}}
                     />
+                  </section>
+
+                  {/* Map section - MOVED TO BOTTOM */}
+                  <section style={{ maxWidth: 900, margin: "26px auto 0 auto", padding: "0 13px" }}>
+                    <GoogleMapsStoreLocator />
                   </section>
                 </div>
               </>
@@ -471,6 +475,11 @@ function MainTyreSenseRoutes() {
       </Routes>
       {/* Place the Tawk.to chat widget component here */}
       <TawkToChatWidget />
+
+      {/* Footer */}
+      <footer className="app-footer">
+         © {new Date().getFullYear()} TyreSense, All rights reserved
+      </footer>
     </div>
   );
 }
