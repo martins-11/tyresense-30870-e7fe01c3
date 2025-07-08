@@ -451,6 +451,7 @@ function MainTyreSenseRoutes() {
 
                   {/* Map section - MOVED TO BOTTOM */}
                   <section style={{ maxWidth: 900, margin: "26px auto 0 auto", padding: "0 13px" }}>
+                    <h2 className="map-title" style={{ color: "#fff", textAlign: "center", marginBottom: "20px", fontWeight: 700, fontSize: "2rem" }}>Find Tyre Stores Nearby</h2>
                     <GoogleMapsStoreLocator />
                   </section>
                 </div>
