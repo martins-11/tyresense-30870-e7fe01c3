@@ -7,5 +7,6 @@ import LeafletStoreLocator from "./LeafletStoreLocator";
  * This file is retained only for backward compatibility.
  */
 export default function GoogleMapsStoreLocator(props) {
+  // Pass all props directly to LeafletStoreLocator, including onStoresFound
   return <LeafletStoreLocator {...props} />;
 }

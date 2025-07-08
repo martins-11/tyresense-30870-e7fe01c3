@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react"; // Add useCallback
 import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import "./TyreSenseMain.css"; // Ensure your CSS file is correctly linked
-// import ReminderPopup from "./ReminderPopup"; // REMOVED
 import CarDetailsInput from "./CarDetailsInput";
 import GoogleMapsStoreLocator from "./GoogleMapsStoreLocator";
 import TyreBrandDetail from "./TyreBrandDetail";
@@ -89,11 +88,27 @@ function MainTyreSenseRoutes() {
   const logoFadeInTimeout = useRef();
 
   const [userCar, setUserCar] = useState(loadCarFromLS());
-  // const [reminderTyre, setReminderTyre] = useState(null); // REMOVED
-  // const [showReminderPopup, setShowReminderPopup] = useState(false); // REMOVED
 
   // --- Geolocation for map ---
   const [userLocation, setUserLocation] = useState(null);
+  // State for found stores
+  const [foundTyreStores, setFoundTyreStores] = useState([]);
+
+  // NEW: Callback to sort and limit stores before setting state
+  const handleStoresFound = useCallback((stores) => {
+    // Ensure stores have a valid distance property
+    const validStores = stores.filter(store => typeof store.distance === 'number' && !isNaN(store.distance));
+
+    // Sort stores by distance in ascending order
+    const sortedStores = [...validStores].sort((a, b) => a.distance - b.distance);
+
+    // Take only the first 10 nearest stores for display
+    const top10Stores = sortedStores.slice(0, 10);
+
+    setFoundTyreStores(top10Stores);
+  }, []); // useCallback memoizes this function, good for performance
+
+
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -103,33 +118,6 @@ function MainTyreSenseRoutes() {
       );
     }
   }, []);
-
-  // -- Tyre replacement popup logic: Show reminder (modal/popup) on "Remind Me",
-  // and/or when tyres are due for replacement --
-
-  // Make reminder popup visible
-  // function handleSetReminderPopup(tyre) { // REMOVED
-  //   setReminderTyre(tyre);
-  //   setShowReminderPopup(true);
-  // }
-
-  // Check for overdue tyres and auto-trigger popup on mount/car change
-  // useEffect(() => { // REMOVED
-  //   if (userCar && userCar.lastTyreChange) {
-  //     const lastChangeDate = new Date(userCar.lastTyreChange);
-  //     const today = new Date();
-  //     const diffYears = (today - lastChangeDate) / (1000 * 60 * 60 * 24 * 365.25);
-  //     // Criteria: more than 6 years since tyre change triggers popup (overdue)
-  //     if (diffYears >= 6 && !showReminderPopup) {
-  //       // Note: Use any demo tyre as context; in real app, would track which
-  //       setReminderTyre({
-  //         brand: userCar.make ? "Your Vehicle Tyre" : "Tyre",
-  //         model: userCar.model ? userCar.model : "Model",
-  //       });
-  //       setShowReminderPopup(true);
-  //     }
-  //   }
-  // }, [userCar]);
 
   // Re-introduce animation-related useEffects and functions
   useEffect(() => {
@@ -151,11 +139,6 @@ function MainTyreSenseRoutes() {
     };
   }, []);
 
-  // function closeReminderPopup() { // REMOVED
-  //   setShowReminderPopup(false);
-  //   setTimeout(() => setReminderTyre(null), 300);
-  // }
-
   const showBlackout = stage !== "SHOW_MAIN";
   const blackoutStyle = showBlackout
     ? { opacity: stage === "LIFT_BLACKOUT" ? 0 : 1, transition: "opacity 540ms cubic-bezier(.71,0,.38,1)", pointerEvents: "all", zIndex: 2000 }
@@ -175,8 +158,25 @@ function MainTyreSenseRoutes() {
     }
   };
 
-  // Navbar/logo is shown for both main and brand pages
-  // Main UI per Porsche visual guidelines
+  // Function to handle opening the store in Google Maps
+  const handleViewOnGoogleMaps = (store) => {
+    if (store.position && store.position.length === 2) {
+      const lat = store.position[0];
+      const lng = store.position[1];
+      const name = encodeURIComponent(store.name); // Encode name for URL
+      const address = encodeURIComponent(store.address);
+
+      // Preferred: Universal link that works on web and mobile (opens app if installed)
+      // Using 'search' query parameter (q) is more robust for generic places
+      const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${store.id || ''}&q=${name},${address}`;
+
+      window.open(googleMapsUrl, "_blank");
+    } else {
+      alert("Location data not available for this store.");
+    }
+  };
+
+
   return (
     <div className="tyresense-main">
       {/* Persistent Porsche-minimal logo as navbar */}
@@ -319,8 +319,7 @@ function MainTyreSenseRoutes() {
                     }}
                   >
                     Premium tyres. <br/> <br/>
-                    Engineered for performance. <br/> <br/> 
-                    Select your vehicle and explore leading brands.
+                    Engineered for performance. <br/> <br/>
                   </div>
                     <h2 className="brands-title">Brands</h2>
                   {/* --- Porsche-style full-width main tyres grid: replaces ALL previous grid/card JSX --- */}
@@ -419,41 +418,82 @@ function MainTyreSenseRoutes() {
                       persistCar={saveCarToLS}
                     />
                   </section>
-                  {/* Removed the entire ReminderPopup section */}
-                  {/* <section style={{ maxWidth: 900, margin: "30px auto 0 auto", minHeight: 64 }}>
-                    {showReminderPopup && reminderTyre ? (
-                      <ReminderPopup
-                        tyre={reminderTyre}
-                        userEmail={userCar?.email || ""}
-                        onClose={closeReminderPopup}
-                      />
-                    ) : (
-                      <div style={{
-                        minWidth: 260, minHeight: 43, background: "rgba(34,34,37,0.97)", color: "#fff",
-                        borderRadius: 11, border: "1.2px solid #252526", padding: "17px 13px", textAlign: "center",
-                        fontSize: "1.05rem", fontWeight: 500, boxShadow: "0 2px 9px #222", opacity: 0.87, marginTop: 8
-                      }}>
-                        <span>Tyre replacement reminder will appear here.</span>
-                      </div>
-                    )}
-                  </section> */}
 
                   {/* Tyre Recommendations section */}
                   <section style={{ maxWidth: 900, margin: "30px auto 0 auto" }}>
                     <TyreRecommendations
                       car={userCar}
                       userLocation={userLocation}
-                      // onSetReminder={handleSetReminderPopup} // REMOVED
                       userTyreData={null}
                       persistTyreData={() => {}}
                     />
                   </section>
 
-                  {/* Map section - MOVED TO BOTTOM */}
+                  {/* Map section */}
                   <section style={{ maxWidth: 900, margin: "26px auto 0 auto", padding: "0 13px" }}>
-                    <h2 className="map-title" style={{ color: "#fff", textAlign: "center", marginBottom: "20px", fontWeight: 700, fontSize: "2rem" }}>Find Tyre Stores Nearby</h2>
-                    <GoogleMapsStoreLocator />
+                    <h2 className="map-title" style={{ color: "#fff", textAlign: "center", marginBottom: "20px", fontWeight: 700, fontSize: "2rem" }}>Find Tyre Stores on Map</h2>
+                    {/* Pass our new handler function */}
+                    <GoogleMapsStoreLocator onStoresFound={handleStoresFound} />
                   </section>
+
+                  {/* Display found tyre stores here */}
+                  {foundTyreStores.length > 0 && (
+                    <section style={{ maxWidth: 900, margin: "26px auto 0 auto", padding: "0 13px" }}>
+                        <h2 className="map-title" style={{ color: "#fff", textAlign: "center", marginBottom: "20px", fontWeight: 700, fontSize: "2rem" }}>Tyre Stores Found Nearby</h2>
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                            gap: '20px',
+                            marginBottom: '30px',
+                            padding: '0 10px'
+                        }}>
+                            {foundTyreStores.map(store => (
+                                <div key={store.id} style={{
+                                    background: 'var(--porsche-black-alt, #1a1a1a)', /* Fallback if not defined in CSS */
+                                    color: '#fff',
+                                    borderRadius: '8px',
+                                    padding: '15px',
+                                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                                    border: '1px solid var(--porsche-border-light, #2c2c2c)', /* Fallback */
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                }}>
+                                    <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem', color: 'var(--porsche-red, #e10600)' }}>{store.name}</h3> {/* Fallback */}
+                                    <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#ccc' }}>{store.address}</p>
+                                    {/* Display distance in a user-friendly format (e.g., km) */}
+                                    {store.distance !== undefined && (
+                                        <p style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#aaa' }}>
+                                            Distance: {store.distance < 1000 ? `${store.distance.toFixed(0)} m` : `${(store.distance / 1000).toFixed(1)} km`}
+                                        </p>
+                                    )}
+                                    {store.tags?.phone && <p style={{ margin: '0 0 5px 0', fontSize: '0.85rem', color: '#aaa' }}>Phone: {store.tags.phone}</p>}
+                                    {store.tags?.opening_hours && <p style={{ margin: '0 0 15px 0', fontSize: '0.85rem', color: '#aaa' }}>Hours: {store.tags.opening_hours}</p>}
+                                    <button
+                                        onClick={() => handleViewOnGoogleMaps(store)}
+                                        style={{
+                                            background: 'var(--porsche-red, #e10600)',
+                                            color: '#fff',
+                                            border: 'none',
+                                            borderRadius: '5px',
+                                            padding: '10px 15px',
+                                            fontSize: '1rem',
+                                            cursor: 'pointer',
+                                            fontWeight: 'bold',
+                                            marginTop: 'auto', // Push button to bottom
+                                            alignSelf: 'flex-start', // Align button to start
+                                            transition: 'background-color 0.2s ease-in-out'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--porsche-red-hover, #b40400)'} // Fallback
+                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--porsche-red, #e10600)'} // Fallback
+                                    >
+                                        View on Google Maps
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                  )}
                 </div>
               </>
             )
@@ -479,7 +519,7 @@ function MainTyreSenseRoutes() {
 
       {/* Footer */}
       <footer className="app-footer">
-         © {new Date().getFullYear()} TyreSense, All rights reserved
+          © {new Date().getFullYear()} TyreSense, All rights reserved
       </footer>
     </div>
   );
