@@ -5,8 +5,7 @@ import "./TyreTypesShowcase.css";
  * PUBLIC_INTERFACE
  * TyreTypesShowcase
  * Displays premium tyre brand cards styled in a Porsche-like vertical container.
- * 
- * @param {function} onBrandSelect - Called when a brand is clicked, receives brand object.
+ * * @param {function} onBrandSelect - Called when a brand is clicked, receives brand object.
  * @param {Array} brands - Optional list of tyre brands to show. Defaults to preset premium brands.
  */
 
