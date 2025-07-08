@@ -163,21 +163,7 @@ fetch(
  return (
     <>
       {/* Tyre replacement reminder div */}
-      <div
-        style={{
-          background: "#232327",
-          color: "#fff",
-          padding: "15px",
-          textAlign: "center",
-          borderRadius: "8px",
-          marginBottom: "20px",
-          fontWeight: "bold",
-          fontSize: "1.1em",
-        }}
-      >
-        Tyre replacement reminder will appear here.
-      </div>
-
+      
       <section className="ts-section ts-tyre-recommend-section" aria-label="Tyre recommendations">
         <header style={{ marginBottom: 16 }}>
           <h2 style={{ color: "#b4081b", fontWeight: 800, letterSpacing: "0.08em" }}>
