@@ -1,11 +1,12 @@
 // src/TyreSenseMain.js -- This file should ONLY contain this code.
 import React, { useEffect, useRef, useState } from "react";
-import { Routes, Route, useNavigate, useLocation, useParams } from "react-router-dom";
+// Removed useLocation as it's no longer used
+import { Routes, Route, useNavigate, useParams } from "react-router-dom"; 
 import "./TyreSenseMain.css";
 import ReminderPopup from "./ReminderPopup";
 import CarDetailsInput from "./CarDetailsInput";
 import GoogleMapsStoreLocator from "./GoogleMapsStoreLocator";
-import TyreTypesShowcase from "./TyreTypesShowcase"; // Imported
+import TyreTypesShowcase from "./TyreTypesShowcase";
 import TyreBrandDetail from "./TyreBrandDetail";
 import AnimatedCarIntro from "./AnimatedCarIntro";
 import TyreRecommendations from "./TyreRecommendations";
@@ -40,8 +41,8 @@ const MAIN_TYRES = [
     size: "225/40R18",
     price: 127,
     url: "https://www.michelin.co.uk/auto/tyres/michelin-pilot-sport-4",
-    // NOTE: Keep your change for michelin_brand_cover.jpg here, if that's the one you want
-    img: `${process.env.PUBLIC_URL || ""}/assets/michelin-brand-cover.jpg`,
+    // Corrected image path: underscore instead of hyphen as per file system
+    img: `${process.env.PUBLIC_URL || ""}/assets/michelin_brand_cover.jpg`, 
     desc: "Motion for Life.",
     brandId: "michelin",
     img_alt: "Michelin Pilot Sport 4 tyre photo"
@@ -168,7 +169,7 @@ function MainTyreSenseRoutes() { // Removed 'props' as it's unused
 
   // For navigation
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation(); // Removed 'location' as it's unused
 
   // Brand selection navigation
   const handleBrandSelect = (brand) => {
@@ -380,7 +381,7 @@ function MainTyreSenseRoutes() { // Removed 'props' as it's unused
                         <div className="porsche-tyre-card-img-wrapper">
                           <img
                             src={tyre.img || tyre.image || ""}
-                            alt={`${tyre.brand} ${tyre.model} premium tyre${tyre.type ? ", " + tyre.type : ""}`} // FIX: Removed unnecessary escapes and math-inline
+                            alt={`${tyre.brand} ${tyre.model} premium tyre${tyre.type ? ", " + tyre.type : ""}`}
                             className="porsche-tyre-card-image"
                             loading="lazy"
                             draggable={false}
@@ -447,7 +448,7 @@ function MainTyreSenseRoutes() { // Removed 'props' as it's unused
                   {/* Add TyreTypesShowcase here, or combine with the above grid as needed */}
                   {/* For example, if you want it after the main grid */}
                   <div style={{ margin: "58px 0 0 0" }} /> {/* Spacing */}
-                  <TyreTypesShowcase onBrandSelect={handleBrandSelect} /> {/* FIX: Using TyreTypesShowcase */}
+                  <TyreTypesShowcase onBrandSelect={handleBrandSelect} /> {/* Using TyreTypesShowcase */}
                   <div style={{ margin: "58px 0 0 0" }} /> {/* Spacing for visual balance */}
 
 
