@@ -52,8 +52,8 @@
   color: #fff;
   display: flex;
   flex-direction: column; /* Keep as column */
-  /* align-items: flex-end; Remove this */
-  /* justify-content: flex-end; Remove this */
+  /* align-items: flex-end; Remove these two as we're managing flex content explicitly */
+  /* justify-content: flex-end; */
   padding: 0;
   overflow: hidden;
   min-height: 235px; /* Ensure a minimum height for the card itself */
@@ -94,29 +94,29 @@
 
 /* Cover background for full image impact */
 .tyre-brand-cover-bg {
-  position: relative; /* Changed from absolute to relative to take up space */
+  position: relative; /* CHANGED: Make this relative so it takes up space in the flex column */
   width: 100%;
-  height: 180px; /* Crucial: Define a fixed height for the image section */
+  height: 180px; /* ADDED: Define a fixed height for the image area (adjust as needed) */
   overflow: hidden;
   border-radius: inherit;
-  /* pointer-events: none; Removed, as it's not needed here and can interfere if child elements need interaction */
+  /* pointer-events: none; REMOVED: Not needed here, as the overlay handles preventing clicks */
   display: block;
   z-index: 2;
 }
 
 /* Visually impactful tyre image */
 .tyre-brand-img {
-  position: absolute; /* Added absolute positioning to fill its *newly relative* parent */
+  position: absolute; /* ADDED: Position absolutely within its new relative parent (.tyre-brand-cover-bg) */
   top: 0;
   left: 0;
-  width: 100%; /* Will now fill the 180px height of its parent */
-  height: 100%; /* Will now fill the 180px height of its parent */
-  min-width: 100%; /* Ensure it's at least 100% */
-  min-height: 100%; /* Ensure it's at least 100% */
+  width: 100%; /* Now correctly fills the width of .tyre-brand-cover-bg */
+  height: 100%; /* Now correctly fills the height of .tyre-brand-cover-bg (180px) */
+  min-width: 100%;
+  min-height: 100%;
   max-width: unset;
   max-height: unset;
   display: block;
-  object-fit: cover; /* This will now properly cover the defined height */
+  object-fit: cover; /* This will now properly cover the defined 180px height */
   object-position: center;
   border-radius: inherit;
   background: #191932;
@@ -142,7 +142,7 @@
   border-radius: inherit;
   background: linear-gradient(145deg, #18181fda 22%, #232327cc 64%, #0c0c0e99 98%);
   transition: background 0.12s ease;
-  pointer-events: none;
+  pointer-events: none; /* Keep this so clicks go through to the button */
   box-shadow: none;
 }
 
@@ -211,7 +211,7 @@
     padding: 0;
   }
   .tyre-brand-cover-bg {
-    height: 150px; /* Adjusted height for mobile */
+    height: 150px; /* Adjusted height for mobile screens */
   }
   .tyre-brand-info-col,
   .premium-info-col {
