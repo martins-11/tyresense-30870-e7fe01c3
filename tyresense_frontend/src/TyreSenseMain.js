@@ -1,7 +1,7 @@
 // src/TyreSenseMain.js -- This file should ONLY contain this code.
 import React, { useEffect, useRef, useState } from "react";
 // Removed useLocation as it's no longer used
-import { Routes, Route, useNavigate, useParams } from "react-router-dom"; 
+import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import "./TyreSenseMain.css";
 import ReminderPopup from "./ReminderPopup";
 import CarDetailsInput from "./CarDetailsInput";
@@ -42,7 +42,7 @@ const MAIN_TYRES = [
     price: 127,
     url: "https://www.michelin.co.uk/auto/tyres/michelin-pilot-sport-4",
     // Corrected image path: underscore instead of hyphen as per file system
-    img: `${process.env.PUBLIC_URL || ""}/assets/michelin_brand_cover.jpg`, 
+    img: `${process.env.PUBLIC_URL || ""}/assets/michelin_brand_cover.jpg`,
     desc: "Motion for Life.",
     brandId: "michelin",
     img_alt: "Michelin Pilot Sport 4 tyre photo"
@@ -386,8 +386,8 @@ function MainTyreSenseRoutes() { // Removed 'props' as it's unused
                             loading="lazy"
                             draggable={false}
                             style={{
-                              width: "98%",
-                              height: "98%",
+                              width: "100%", // Changed from 98% to 100%
+                              height: "100%", // Changed from 98% to 100%
                               maxWidth: 246,
                               maxHeight: 186,
                               objectFit: "cover",
